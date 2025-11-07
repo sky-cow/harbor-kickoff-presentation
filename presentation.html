@@ -1,427 +1,468 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Harbor API Integration Training</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            overflow: hidden;
-            color: #333;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        .logo img {
-            animation: float 3s ease-in-out infinite;
-            display: flex;
-            margin: auto;
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+        color: #333;
+      }
+
+      .logo img {
+        animation: float 3s ease-in-out infinite;
+        display: flex;
+        margin: auto;
+      }
+
+      .presentation {
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px;
+      }
+
+      .slide {
+        background: white;
+        border-radius: 20px;
+        padding: 60px 80px;
+        max-width: 1200px;
+        width: 100%;
+        height: 85%;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        display: none;
+        flex-direction: column;
+        justify-content: flex-start;
+        position: relative;
+        overflow-y: auto;
+      }
+
+      .slide.active {
+        display: flex;
+        animation: slideIn 0.5s ease;
+      }
+
+      @keyframes slideIn {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
         }
-        
-        .presentation {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
+        to {
+          opacity: 1;
+          transform: translateX(0);
         }
-        
-        .slide {
-            background: white;
-            border-radius: 20px;
-            padding: 60px 80px;
-            max-width: 1200px;
-            width: 100%;
-            height: 85%;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            display: none;
-            flex-direction: column;
-            justify-content: flex-start;
-            position: relative;
-            overflow-y: auto;
-        }
-        
-        .slide.active {
-            display: flex;
-            animation: slideIn 0.5s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(50px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-        
-        .slide-number {
-            position: absolute;
-            top: 20px;
-            right: 40px;
-            color: #999;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        h1 {
-            color: #667eea;
-            font-size: 3em;
-            margin-bottom: 20px;
-            line-height: 1.2;
-        }
-        
-        h2 {
-            color: #667eea;
-            font-size: 2.2em;
-            margin-bottom: 30px;
-            border-bottom: 4px solid #667eea;
-            padding-bottom: 15px;
-        }
-        
-        h3 {
-            color: #764ba2;
-            font-size: 1.6em;
-            margin: 25px 0 15px 0;
-        }
-        
-        .subtitle {
-            color: #666;
-            font-size: 1.4em;
-            margin-bottom: 40px;
-            text-align: center;
-        }
-        
-        .title-slide {
-            text-align: center;
-        }
-        
-        .title-slide h1 {
-            font-size: 3.5em;
-            margin-bottom: 30px;
-        }
-        
-        ul, ol {
-            margin-left: 30px;
-            line-height: 1.8;
-            font-size: 1.1em;
-        }
-        
-        li {
-            margin-bottom: 12px;
-        }
-        
-        .highlight-box {
-            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
-            border-left: 5px solid #667eea;
-            padding: 20px;
-            margin: 20px 0;
-            border-radius: 8px;
-        }
-        
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin: 20px 0;
-        }
-        
-        .code-block {
-            background: #2d2d2d;
-            color: #f8f8f2;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            overflow-x: auto;
-            margin: 15px 0;
-        }
-        
-        pre {
-            margin: 0;
-            white-space: pre-wrap;
-        }
-        
-        .diagram {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 10px;
-            text-align: center;
-            margin: 20px 0;
-            font-family: monospace;
-            line-height: 2;
-            border: 2px solid #e9ecef;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 0.95em;
-        }
-        
-        th, td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid #e9ecef;
-        }
-        
-        th {
-            background: #667eea;
-            color: white;
-            font-weight: 600;
-        }
-        
-        tr:hover {
-            background: #f8f9fa;
-        }
-        
-        .controls {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 20px;
-            z-index: 1000;
-        }
-        
-        button {
-            background: white;
-            border: none;
-            padding: 15px 30px;
-            border-radius: 50px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
-        }
-        
-        button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-        
-        .progress-bar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            height: 14px;
-            background: #667eea;
-            transition: width 0.3s;
-            z-index: 1000;
-        }
-        
-        .section-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 15px;
-            text-align: center;
-            margin-bottom: 30px;
-            margin-top: 0;
-            font-size: 2em;
-            font-weight: bold;
-        }
-        
-        strong {
-            color: #667eea;
-        }
-        
-        .checkmark {
-            color: #28a745;
-            font-weight: bold;
-        }
-        
-        .xmark {
-            color: #dc3545;
-            font-weight: bold;
-        }
+      }
+
+      .slide-number {
+        position: absolute;
+        top: 20px;
+        right: 40px;
+        color: #999;
+        font-size: 14px;
+        font-weight: 500;
+      }
+
+      h1 {
+        color: #667eea;
+        font-size: 3em;
+        margin-bottom: 20px;
+        line-height: 1.2;
+      }
+
+      h2 {
+        color: #667eea;
+        font-size: 2.2em;
+        margin-bottom: 30px;
+        border-bottom: 4px solid #667eea;
+        padding-bottom: 15px;
+      }
+
+      h3 {
+        color: #764ba2;
+        font-size: 1.6em;
+        margin: 25px 0 15px 0;
+      }
+
+      .subtitle {
+        color: #666;
+        font-size: 1.4em;
+        margin-bottom: 40px;
+        text-align: center;
+      }
+
+      .title-slide {
+        text-align: center;
+      }
+
+      .title-slide h1 {
+        font-size: 3.5em;
+        margin-bottom: 30px;
+      }
+
+      ul,
+      ol {
+        margin-left: 30px;
+        line-height: 1.8;
+        font-size: 1.1em;
+      }
+
+      li {
+        margin-bottom: 12px;
+      }
+
+      .highlight-box {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-left: 5px solid #667eea;
+        padding: 20px;
+        margin: 20px 0;
+        border-radius: 8px;
+      }
+
+      .two-column {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        margin: 20px 0;
+      }
+
+      .code-block {
+        background: #2d2d2d;
+        color: #f8f8f2;
+        padding: 20px;
+        border-radius: 10px;
+        font-family: "Courier New", monospace;
+        font-size: 0.9em;
+        overflow-x: auto;
+        margin: 15px 0;
+      }
+
+      pre {
+        margin: 0;
+        white-space: pre-wrap;
+      }
+
+      .diagram {
+        background: #f8f9fa;
+        padding: 30px;
+        border-radius: 10px;
+        text-align: center;
+        margin: 20px 0;
+        font-family: monospace;
+        line-height: 2;
+        border: 2px solid #e9ecef;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 0.95em;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        text-align: left;
+        border-bottom: 1px solid #e9ecef;
+      }
+
+      th {
+        background: #667eea;
+        color: white;
+        font-weight: 600;
+      }
+
+      tr:hover {
+        background: #f8f9fa;
+      }
+
+      .controls {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        gap: 20px;
+        z-index: 1000;
+      }
+
+      button {
+        background: white;
+        border: none;
+        padding: 15px 30px;
+        border-radius: 50px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        transition: all 0.3s;
+      }
+
+      button:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+      }
+
+      button:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      .progress-bar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 14px;
+        background: #667eea;
+        transition: width 0.3s;
+        z-index: 1000;
+      }
+
+      .section-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 20px 40px;
+        border-radius: 15px;
+        text-align: center;
+        margin-bottom: 30px;
+        margin-top: 0;
+        font-size: 2em;
+        font-weight: bold;
+      }
+
+      strong {
+        color: #667eea;
+      }
+
+      .checkmark {
+        color: #28a745;
+        font-weight: bold;
+      }
+
+      .xmark {
+        color: #dc3545;
+        font-weight: bold;
+      }
     </style>
-</head>
+  </head>
 
-    <div class="progress-bar" id="progressBar"></div>
-    <div class="logo" id="logo">
-        <img src="./images/logo_harbor.png" alt="Harbor Logo" style="position: fixed; top: 20px; left: 20px; height: 50px; z-index: 1000;">
-    </div>
+  <div class="progress-bar" id="progressBar"></div>
+  <div class="logo" id="logo">
+    <img
+      src="./images/logo_harbor.png"
+      alt="Harbor Logo"
+      style="
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        height: 50px;
+        z-index: 1000;
+      "
+    />
+  </div>
 
-    
-    <div class="presentation">
-        <!-- Slide 0: Title
+  <div class="presentation">
+    <!-- Slide 0: Title
         <div class="slide active title-slide">
             <h1>Harbor API Integration Guide</h1>
             <p class="subtitle">Enabling Seamless Fiat ↔ Crypto Conversions</p>
         </div> -->
 
-        <!-- Slide 1 -->
-        <div class="slide">
-            <div class="slide-number active ">1 / 20</div>
-            <div class="section-header">PART 1: INTRODUCTION</div>
-            <h2>What is Harbor?</h2>
-            <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>Harbor by OwlPay</strong> - Complete fiat-to-crypto infrastructure in one API</p>
-            
-            <h3>What We Do:</h3>
-            <ul>
-                <li><strong>On-Ramp:</strong> USD → Stablecoins (USDC)</li>
-                <li><strong>Off-Ramp:</strong> Stablecoins → USD</li>
-                <li><strong>On-Chain:</strong> Cross-blockchain transfers</li>
-                <li><strong>Compliance:</strong> Full KYC/AML included</li>
-                <li><strong>Banking:</strong> Direct integrations ready</li>
-            </ul>
-            
-            <div class="two-column" style="margin-top: 30px;">
-                <div>
-                    <h3>Without Harbor:</h3>
-                    <ul style="font-size: 0.95em;">
-                        <li><span class="xmark">❌</span> Banking partnerships (6-12 months)</li>
-                        <li><span class="xmark">❌</span> Compliance infrastructure ($500K+)</li>
-                        <li><span class="xmark">❌</span> Manage liquidity (complex)</li>
-                        <li><span class="xmark">❌</span> Multiple blockchains (months)</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>With Harbor:</h3>
-                    <ul style="font-size: 0.95em;">
-                        <li><span class="checkmark">✅</span> <strong>One API</strong> for everything</li>
-                        <li><span class="checkmark">✅</span> <strong>2 weeks</strong> to integrate</li>
-                        <li><span class="checkmark">✅</span> <strong>We handle</strong> compliance, banking</li>
-                        <li><span class="checkmark">✅</span> <strong>5+ blockchains</strong> supported</li>
-                    </ul>
-                </div>
-            </div>
+    <!-- Slide 1 -->
+    <div class="slide">
+      <div class="slide-number active">1 / 20</div>
+      <div class="section-header">PART 1: INTRODUCTION</div>
+      <h2>What is Harbor?</h2>
+      <p style="font-size: 1.2em; margin-bottom: 20px">
+        <strong>Harbor by OwlPay</strong> - Complete fiat-to-crypto
+        infrastructure in one API
+      </p>
+
+      <h3>What We Do:</h3>
+      <ul>
+        <li><strong>On-Ramp:</strong> USD → Stablecoins (USDC)</li>
+        <li><strong>Off-Ramp:</strong> Stablecoins → USD</li>
+        <li><strong>On-Chain:</strong> Cross-blockchain transfers</li>
+        <li><strong>Compliance:</strong> Full KYC/AML included</li>
+        <li><strong>Banking:</strong> Direct integrations ready</li>
+      </ul>
+
+      <div class="two-column" style="margin-top: 30px">
+        <div>
+          <h3>Without Harbor:</h3>
+          <ul style="font-size: 0.95em">
+            <li>
+              <span class="xmark">❌</span> Banking partnerships (6-12 months)
+            </li>
+            <li>
+              <span class="xmark">❌</span> Compliance infrastructure ($500K+)
+            </li>
+            <li><span class="xmark">❌</span> Manage liquidity (complex)</li>
+            <li><span class="xmark">❌</span> Multiple blockchains (months)</li>
+          </ul>
         </div>
-
-        <!-- Slide 2 -->
-        <div class="slide">
-            <div class="slide-number">2 / 20</div>
-            <h2>Who Uses Harbor - Real Scenarios</h2>
-            
-            <div class="highlight-box">
-                <h3>1. Wallet Service Providers</h3>
-                <p><em>"Users want to buy crypto with fiat in my wallet app"</em></p>
-                <p>→ Integrate Harbor API → users deposit USD → receive USDC</p>
-                <p>→ No banking license needed, we handle fiat settlement</p>
-            </div>
-            
-            <div class="highlight-box">
-                <h3>2. Banks & Financial Institutions</h3>
-                <p><em>"Customers want crypto, but we have no infrastructure"</em></p>
-                <p>→ Your brand, our technology → offer crypto trading</p>
-                <p>→ We manage blockchain complexity</p>
-            </div>
-            
-            <div class="highlight-box">
-                <h3>3. Payment Service Providers (PSPs)</h3>
-                <p><em>"Cross-border payments to US are slow and expensive"</em></p>
-                <p>→ We operate as <strong>Beneficiary Financial Institution (BFI)</strong></p>
-                <p>→ You send USDC → we deliver USD to US banks</p>
-            </div>
-
-              <div class="highlight-box">
-                <h3>4. E-Commerce & Marketplaces</h3>
-                <p><em>"Accept crypto, pay merchants in fiat"</em></p>
-                <p>→ Customers pay USDC → we convert → merchants get USD</p>
-                <p>→ Zero crypto complexity for your merchants</p>
-            </div>
-            
-            <div class="highlight-box">
-                <h3>5. Payroll Companies</h3>
-                <p><em>"Pay global contractors in stablecoins"</em></p>
-                <p>→ Batch upload → instant USDC to wallets worldwide</p>
-                <p>→ 24/7 payments, no bank delays</p>
-            </div>
+        <div>
+          <h3>With Harbor:</h3>
+          <ul style="font-size: 0.95em">
+            <li>
+              <span class="checkmark">✅</span> <strong>One API</strong> for
+              everything
+            </li>
+            <li>
+              <span class="checkmark">✅</span> <strong>2 weeks</strong> to
+              integrate
+            </li>
+            <li>
+              <span class="checkmark">✅</span>
+              <strong>We handle</strong> compliance, banking
+            </li>
+            <li>
+              <span class="checkmark">✅</span>
+              <strong>5+ blockchains</strong> supported
+            </li>
+          </ul>
         </div>
+      </div>
+    </div>
 
-        <!-- Slide 3 -->
-        <!-- <div class="slide">
+    <!-- Slide 2 -->
+    <div class="slide">
+      <div class="slide-number">2 / 20</div>
+      <h2>Who Uses Harbor - Real Scenarios</h2>
+
+      <div class="highlight-box">
+        <h3>1. Wallet Service Providers</h3>
+        <p><em>"Users want to buy crypto with fiat in my wallet app"</em></p>
+        <p>→ Integrate Harbor API → users deposit USD → receive USDC</p>
+        <p>→ No banking license needed, we handle fiat settlement</p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>2. Banks & Financial Institutions</h3>
+        <p><em>"Customers want crypto, but we have no infrastructure"</em></p>
+        <p>→ Your brand, our technology → offer crypto trading</p>
+        <p>→ We manage blockchain complexity</p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>3. Payment Service Providers (PSPs)</h3>
+        <p><em>"Cross-border payments to US are slow and expensive"</em></p>
+        <p>
+          → We operate as
+          <strong>Beneficiary Financial Institution (BFI)</strong>
+        </p>
+        <p>→ You send USDC → we deliver USD to US banks</p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>4. E-Commerce & Marketplaces</h3>
+        <p><em>"Accept crypto, pay merchants in fiat"</em></p>
+        <p>→ Customers pay USDC → we convert → merchants get USD</p>
+        <p>→ Zero crypto complexity for your merchants</p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>5. Payroll Companies</h3>
+        <p><em>"Pay global contractors in stablecoins"</em></p>
+        <p>→ Batch upload → instant USDC to wallets worldwide</p>
+        <p>→ 24/7 payments, no bank delays</p>
+      </div>
+    </div>
+
+    <!-- Slide 3 -->
+    <!-- <div class="slide">
             <div class="slide-number">3 / 20</div>
             <h2>More Use Cases</h2>
             
           
         </div> -->
 
-        <!-- Slide 4 -->
-        <div class="slide">
-            <div class="slide-number">4 / 20</div>
-            <div class="section-header">PART 2: CONCEPTUAL OVERVIEW</div>
-            <h2>Harbor Architecture</h2>
-            
-            <div class="diagram">
-┌─────────────────────────────────────────────┐<br>
-         <strong>YOUR APPLICATION</strong>   <br>
-  (Your brand, your customer experience)    <br>
-└─────────────────────────────────────────────┘<br>
-                   │<br>
-                    Simple REST API <br>
-                   ↓<br>
-┌─────────────────────────────────────────────┐<br>
-            <strong>HARBOR PLATFORM</strong> <br>
- ┌──────────┬──────────┬─────────────────┐  <br>
-  KYC/AML Engine  。 Banking Networks  。 Blockchain Integrations  <br>
-  └──────────┴──────────┴─────────────────┘  <br>
-└─────────────────────────────────────────────┘<br>
-                   │<br>
-                   ↓<br>
-┌─────────────────────────────────────────────┐<br>
-          <strong>YOUR END CUSTOMERS</strong><br>
-   (Seamless fiat ↔ crypto experience)     <br>
-└─────────────────────────────────────────────┘
-            </div>
-            
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-top: 30px;">
-                <div>
-                    <h3>You Focus On:</h3>
-                    <ul>
-                        <li>Your product</li>
-                        <li>User experience</li>
-                        <li>Business logic</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>We Handle:</h3>
-                    <ul>
-                        <li>Banking relationships</li>
-                        <li>Compliance & KYC/AML</li>
-                        <li>Blockchain infrastructure</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <!-- Slide 4 -->
+    <div class="slide">
+      <div class="slide-number">4 / 20</div>
+      <div class="section-header">PART 2: CONCEPTUAL OVERVIEW</div>
+      <h2>Harbor Architecture</h2>
 
-        <!-- Slide 5 -->
-        <div class="slide">
-            <div class="slide-number">5 / 20</div>
-            <h2>The Customer Journey</h2>
-            
-            <h3>One-Time Onboarding </h3>
-            <div class="diagram">
-1. Create customer via API<br>
-      ↓<br>
-2. Customer signs agreements<br>
-      ↓<br>
-3. Customer completes KYC<br>
-      ↓<br>
-4. Harbor approves<br>
-      ↓<br>
-5. Add payment method (bank OR crypto wallet)<br>
-      ↓<br>
-6. <span class="checkmark">✅ Ready for transfers!</span>
-            </div>
-<!--             
+      <div class="diagram">
+        ┌─────────────────────────────────────────────┐<br />
+        <strong>YOUR APPLICATION</strong> <br />
+        (Your brand, your customer experience) <br />
+        └─────────────────────────────────────────────┘<br />
+        │<br />
+        Simple REST API <br />
+        ↓<br />
+        ┌─────────────────────────────────────────────┐<br />
+        <strong>HARBOR PLATFORM</strong> <br />
+        ┌──────────┬──────────┬─────────────────┐ <br />
+        KYC/AML Engine 。 Banking Networks 。 Blockchain Integrations <br />
+        └──────────┴──────────┴─────────────────┘ <br />
+        └─────────────────────────────────────────────┘<br />
+        │<br />
+        ↓<br />
+        ┌─────────────────────────────────────────────┐<br />
+        <strong>YOUR END CUSTOMERS</strong><br />
+        (Seamless fiat ↔ crypto experience) <br />
+        └─────────────────────────────────────────────┘
+      </div>
+
+      <div
+        style="
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 30px;
+          margin-top: 30px;
+        "
+      >
+        <div>
+          <h3>You Focus On:</h3>
+          <ul>
+            <li>Your product</li>
+            <li>User experience</li>
+            <li>Business logic</li>
+          </ul>
+        </div>
+        <div>
+          <h3>We Handle:</h3>
+          <ul>
+            <li>Banking relationships</li>
+            <li>Compliance & KYC/AML</li>
+            <li>Blockchain infrastructure</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 5 -->
+    <div class="slide">
+      <div class="slide-number">5 / 20</div>
+      <h2>The Customer Journey</h2>
+
+      <h3>One-Time Onboarding</h3>
+      <div class="diagram">
+        1. Create customer via API<br />
+        ↓<br />
+        2. Customer signs agreements<br />
+        ↓<br />
+        3. Customer completes KYC<br />
+        ↓<br />
+        4. Harbor approves<br />
+        ↓<br />
+        5. Add payment method (bank OR crypto wallet)<br />
+        ↓<br />
+        6. <span class="checkmark">✅ Ready for transfers!</span>
+      </div>
+      <!--             
             <h3> Transactions</h3>
             <ul>
                 <li><strong>On-Ramp (USD → Crypto):</strong> 
@@ -434,73 +475,84 @@
                     <div class="diagram" style="padding: 15px; margin-top: 10px;">USDC on Ethereum → Harbor bridges → USDC on Polygon</div>
                 </li>
             </ul> -->
-        </div>
+    </div>
 
-        <!-- Slide 6 -->
-        <div class="slide">
-            <div class="slide-number">6 / 20</div>
-            <h2>Networks, Assets & Compliance</h2>
-            
-            <div class="two-column">
-                <div>
-                    <h3>Supported Blockchains</h3>
-                    <ul>
-                        <li><strong>Arbitrum</strong> </li>
-                        <li><strong>Avalanche</strong> </li>
-                        <li><strong>Ethereum</strong></li>
-                        <li><strong>Polygon PoS</strong> </li>
-                        <li><strong>Optimism</strong> </li>
-                        <li><strong>Stellar</strong></li>
-                        <li><strong>Solana</strong></li>
-                    </ul>
-                    
-                    <h3>Stablecoins</h3>
-                    <ul>
-                        <li><strong>USDC</strong> (Circle)</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>Fiat Currencies</h3>
-                    <ul>
-                        <li><strong>USD</strong> (United States)</li>
-                        <li>More coming soon</li>
-                    </ul>
-                    
-                    <h3>Compliance (We Handle)</h3>
-                    <ul>
-                        <li><strong>KYC/AML:</strong> Identity verification, risk assessment</li>
-                        <li><strong>Banking Compliance:</strong> BSA, FinCEN, licenses</li>
-                    </ul>
-                    
-                    <h3>What You Provide</h3>
-                    <ul>
-                        <li>Customer basic info</li>
-                        <li>Transfer purpose</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <!-- Slide 6 -->
+    <div class="slide">
+      <div class="slide-number">6 / 20</div>
+      <h2>Networks, Assets & Compliance</h2>
 
-        <!-- Slide 7 -->
-        <div class="slide">
-            <div class="slide-number">7 / 20</div>
-            <h2>Fee Structure & Revenue</h2>
-            
-            <h3>Your Revenue (Commission)</h3>
-            <p>Set your own fees:</p>
-            <ul>
-                <li><strong>Percentage:</strong> 1% of transaction</li>
-                <li><strong>Flat fee:</strong> $2.50 per transaction</li>
-                <li><strong>Hybrid:</strong> Both combined</li>
-            </ul>
-            
-            <h3>Harbor's Processing Fees</h3>
-            <p>Based on: transfer type, volume, amount</p>
-            <p><strong>All fees transparent</strong> - shown upfront in API response</p>
-            
-            <div class="highlight-box" style="margin-top: 30px;">
-                <h3>Example Transaction</h3>
-                <pre style="background: white; padding: 20px; border-radius: 8px; font-size: 1.1em;">
+      <div class="two-column">
+        <div>
+          <h3>Supported Blockchains</h3>
+          <ul>
+            <li><strong>Arbitrum</strong></li>
+            <li><strong>Avalanche</strong></li>
+            <li><strong>Ethereum</strong></li>
+            <li><strong>Polygon PoS</strong></li>
+            <li><strong>Optimism</strong></li>
+            <li><strong>Stellar</strong></li>
+            <li><strong>Solana</strong></li>
+          </ul>
+
+          <h3>Stablecoins</h3>
+          <ul>
+            <li><strong>USDC</strong> (Circle)</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Fiat Currencies</h3>
+          <ul>
+            <li><strong>USD</strong> (United States)</li>
+            <li>More coming soon</li>
+          </ul>
+
+          <h3>Compliance (We Handle)</h3>
+          <ul>
+            <li>
+              <strong>KYC/AML:</strong> Identity verification, risk assessment
+            </li>
+            <li><strong>Banking Compliance:</strong> BSA, FinCEN, MTL's</li>
+          </ul>
+
+          <h3>What You Provide</h3>
+          <ul>
+            <li>Customer basic info</li>
+            <li>Transfer purpose</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Slide 7 -->
+    <div class="slide">
+      <div class="slide-number">7 / 20</div>
+      <h2>Fee Structure & Revenue</h2>
+
+      <h3>Your Revenue (Commission)</h3>
+      <p>Set your own fees:</p>
+      <ul>
+        <li><strong>Percentage:</strong> 1% of transaction</li>
+        <li><strong>Flat fee:</strong> $2.50 per transaction</li>
+        <li><strong>Hybrid:</strong> Both combined</li>
+      </ul>
+
+      <h3>Harbor's Processing Fees</h3>
+      <p>Based on: transfer type, volume, amount</p>
+      <p>
+        <strong>All fees transparent</strong> - shown upfront in API response
+      </p>
+
+      <div class="highlight-box" style="margin-top: 30px">
+        <h3>Example Transaction</h3>
+        <pre
+          style="
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            font-size: 1.1em;
+          "
+        >
 Customer buys $1,000 USDC
 
 Transfer amount:        $1,000.00
@@ -509,325 +561,342 @@ Harbor fee (0.5%):         -$5.00
 ─────────────────────────────────
 Customer receives:        $985.00 USDC
 <strong style="color: #28a745;">You earn:                  $10.00</strong></pre>
-            </div>
-        </div>
+      </div>
+    </div>
 
-        <!-- Slide 8 -->
-        <div class="slide">
-            <div class="slide-number">8 / 20</div>
-            <div class="section-header">PART 3: TECHNICAL OVERVIEW</div>
-            <h2>API Fundamentals</h2>
-            
-            <h3>Endpoints</h3>
-            <div class="code-block">
-<strong>Sandbox:</strong> https://harbor-sandbox.owlpay.com/api/v1
-<strong>Production:</strong> https://harbor-production.owlpay.com/api/v1
-            </div>
-            
-            <h3>Authentication</h3>
-            <div class="code-block">
-X-API-KEY: your_api_key_here
-            </div>
-            <p>Contact <strong>contact-us@owlting.com</strong> for keys</p>
-            
-            <h3>Required Headers</h3>
-            <div class="code-block">
-Content-Type: application/json<br>
-Accept: application/json<br>
-X-API-KEY: {{YOUR_API_KEY}}<br>
-X-Idempotency-Key: {{UNIQUE_ID}}  # For POST requests
-            </div>
-            
-            <h3>Core Endpoints</h3>
-            <div class="code-block">
-# Customers <br>
-POST   /customers              <br>      
-GET    /customers/{uuid}           <br><br>
+    <!-- Slide 8 -->
+    <div class="slide">
+      <div class="slide-number">8 / 20</div>
+      <div class="section-header">PART 3: TECHNICAL OVERVIEW</div>
+      <h2>API Fundamentals</h2>
 
-# Payment Methods<br>
-POST   /customers/{uuid}/bank_accounts        <br>
-POST   /customers/{uuid}/blockchain_addresses   <br><br>
+      <h3>Endpoints</h3>
+      <div class="code-block">
+        <strong>Sandbox:</strong> https://harbor-stage.owlpay.com/api/v1
+        <strong>Production:</strong> https://harbor-production.owlpay.com/api/v1
+      </div>
 
-# Transfers<br>
-POST   /transfers           <br>
-GET    /transfers/{uuid}   <br> 
-            </div>
-        </div>
+      <h3>Authentication</h3>
+      <div class="code-block">X-API-KEY: your_api_key_here</div>
+      <p>Contact <strong>contact-us@owlting.com</strong> for keys</p>
 
-        <!-- Slide 9 -->
-        <div class="slide">
-            <div class="slide-number">9 / 20</div>
-            <h2>Quick Start</h2>
-            
-            <h3>Step 1: Create Customer </h3>
-            <div class="code-block">
-POST /customers <br>
+      <h3>Required Headers</h3>
+      <div class="code-block">
+        Content-Type: application/json<br />
+        Accept: application/json<br />
+        X-API-KEY: {{YOUR_API_KEY}}<br />
+        X-Idempotency-Key: {{UNIQUE_ID}} # For POST requests
+      </div>
 
-{
-  "type": "individual",<br>
-  "first_name": "John",<br> 
-  "last_name": "Doe",<br>       
-  "email": "***@gmail.com",<br>
-  "phone_country_code": "US",<br>
-  "phone_number": "555-555-1234",<br>
-  "birth_date": "1990-01-15"
-}
-            </div>
-            <p><strong>Response:</strong> customer_uuid + KYC links</p>
-            
-            <h3>Step 2: Customer Completes KYC </h3>
-            <p>Note: Be sure to verify request is from Harbor before opening links! <a href="https://harbor-developers.owlpay.com/docs/verifying-requests-from-harbor#/"><strong> See our docs for more detail and examples.</strong></a></p>
-            <ul>
-                <li>Send customer: <code>agreement_link</code> - Sign terms</li>
-                <li>Send customer: <code>verification_link</code> - Upload ID</li>
-                <li>Poll <code>GET /customers/{uuid}</code> until <code>status: "approved"</code></li>
-            </ul>
+      <h3>Core Endpoints</h3>
+      <div class="code-block">
+        # Customers <br />
+        POST /customers <br />
+        GET /customers/{uuid} <br /><br />
 
-                       <h3>Step 3: Register Customer's Bank Account / Crypto Address</h3>
-            <div class="code-block">
-POST /customers/{uuid}/bank_accounts<br>
+        # Payment Methods<br />
+        POST /customers/{uuid}/bank_accounts <br />
+        POST /customers/{uuid}/blockchain_addresses <br /><br />
 
-{
- "account_type": "checking",<br>
-  "account_number": "124567890",<br>
-  "routing_number": "021000021",<br>
-  "bank_name": "Chase Bank",<br>
-  "bank_country": "US",<br>
-  "bank_state": "AL",<br>
-}
-            </div>
-            
-            <h3>Step 4: Create Transfer </h3>
-            <div class="code-block">
-POST /transfers<br>
+        # Transfers<br />
+        POST /transfers <br />
+        GET /transfers/{uuid} <br />
+      </div>
+    </div>
 
-{
-  "on_behalf_of": "cus_abc123",<br> 
-  "source": {"asset": "USD", "amount": "100.00"},<br>
-  "destination": {<br>
-    "asset": "USDC", "chain": "ethereum",<br>
-    "address": "0x742d35Cc...",<br>
-    "transfer_purpose": "Investment",<br>
-  }
-}
-            </div>
-            <p> Note: Please be aware we have a <a href="https://harbor-developers.owlpay.com/docs/simulate-transfer-status-apis#/"><strong>sandbox endpoint to simulate transfers for testing purposes.</strong></a></p>
-        </div>
+    <!-- Slide 9 -->
+    <div class="slide">
+      <div class="slide-number">9 / 20</div>
+      <h2>Quick Start</h2>
 
-        <!-- Slide 10 -->
-        <div class="slide">
-            <div class="slide-number">10 / 20</div>
-            <h2>Workflow 1 - On-Ramp (USD → USDC)</h2>
-            
-            <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>Use Case:</strong> Customer wants to buy crypto</p>
-            
-            <h3>API Request Structure</h3>
-            <div class="code-block">
-{
-  "on_behalf_of": "cus_abc123",
-  "source": {
-    "asset": "USD",
-    "amount": "100.00"
-  },
-  "destination": {
-    "asset": "USDC",
-    "chain": "ethereum",
-    "address": "0x...",
-    "transfer_purpose": "Investment",
-    "is_self_transfer": false
-  },
-  "commission": {"percentage": "0.01", "amount": "1.00"},
-  "application_transfer_uuid": "txn_unique_789"
-}
-            </div>
-            
-            <h3>API Response</h3>
-            <div class="code-block">
-{
-  "transfer_instructions": {
-    "account_number": "123456789",
-    "routing_number": "987654321",
-    "bank_name": "FV Bank",
-    "narrative": "CRITICAL_REF_CODE"  ← Customer MUST include
-  }
-}
-            </div>
-            
-            <div class="diagram">
-Customer sends USD (with ref code) → Harbor receives<br>
-→ Harbor sends USDC to wallet → <span class="checkmark">✅ Complete</span>
-            </div>
-        </div>
+      <h3>Step 1: Create Customer</h3>
+      <div class="code-block">
+        POST /customers <br />
 
-        <!-- Slide 11 -->
-        <div class="slide">
-            <div class="slide-number">11 / 20</div>
-            <h2>Workflow 2 - Off-Ramp (USDC → USD)</h2>
-            
-            <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>Use Case:</strong> Customer wants to cash out</p>
-            
-            <h3>API Request Structure</h3>
-            <div class="code-block">
-{
-  "on_behalf_of": "cus_abc123",
-  "source": {
-    "chain": "ethereum",
-    "asset": "USDC",
-    "amount": "1000.00"
-  },
-  "destination": {
-    "asset": "USD",
-    "customer_bank_account_id": "bank_xyz",
-    "transfer_purpose": "Withdrawal",
-    "is_self_transfer": false
-  },
-  "commission": {"percentage": "0.01", "amount": "1.00"}
-}
-            </div>
-            
-            <h3>API Response</h3>
-            <div class="code-block">
-{
-  "transfer_instructions": {
-    "instruction_chain": "ethereum",
-    "instruction_address": "0xbf2f9dd51e8f..."
-  }
-}
-            </div>
-            
-            <div class="diagram">
-Customer sends USDC on-chain → Harbor receives<br>
-→ Harbor sends USD to bank → <span class="checkmark">✅ Complete</span>
-            </div>
-        </div>
+        { "type": "individual",<br />
+        "first_name": "John",<br />
+        "last_name": "Doe",<br />
+        "email": "***@gmail.com",<br />
+        "phone_country_code": "US",<br />
+        "phone_number": "555-555-1234",<br />
+        "birth_date": "1990-01-15" }
+      </div>
+      <p><strong>Response:</strong> customer_uuid + KYC links</p>
 
-        <!-- Slide 12 -->
-        <div class="slide">
-            <div class="slide-number">12 / 20</div>
-            <h2>Workflow 3 - On-Chain Transfer</h2>
-            
-            <p style="font-size: 1.2em; margin-bottom: 20px;"><strong>Use Case:</strong> Move crypto between blockchains (e.g., Ethereum → Polygon for lower fees)</p>
-            
-            <h3>API Request</h3>
-            <div class="code-block">
-{
-  "on_behalf_of": "cus_abc123",<br>
-  "source": {<br>
-    "chain": "ethereum",<br>
-    "asset": "USDC",<br>
-    "amount": "500.00"<br>
-  },<br>
-  "destination": {<br>
-    "chain": "polygon",<br>
-    "asset": "USDC",<br>
-    "address": "0x...",<br>
-    "transfer_purpose": "Chain migration",<br>
-    "is_self_transfer": true<br>
-  }
-}
-            </div>
-            
-            <div class="diagram" style="margin-top: 30px;">
-USDC moves from Ethereum → Polygon<br>
-Lower fees for future transactions <span class="checkmark">✅</span>
-            </div>
-            
-            <h3>Use Cases:</h3>
-            <ul>
-                <li>L1 ↔ L2 migrations</li>
-                <li>Cross-chain arbitrage</li>
-            </ul>
-        </div>
+      <h3>Step 2: Customer Completes KYC</h3>
+      <p>
+        Note: Be sure to verify request is from Harbor before opening links!
+        <a
+          href="https://harbor-developers.owlpay.com/docs/verifying-requests-from-harbor#/"
+          target="_blank"
+          ><strong> See our docs for more detail and examples.</strong></a
+        >
+      </p>
+      <ul>
+        <li>Send customer: <code>agreement_link</code> - Sign terms</li>
+        <li>Send customer: <code>verification_link</code> - Upload ID</li>
+        <li>
+          Poll <code>GET /customers/{uuid}</code> until
+          <code>status: "approved"</code>
+        </li>
+      </ul>
 
-        <!-- Slide 13 -->
-        <div class="slide">
-            <div class="slide-number">13 / 20</div>
-            <h2>Key API Fields Explained</h2>
-            
-            <div class="highlight-box">
-                <h3>transfer_purpose (Required)</h3>
-                <p>Why the transfer is happening</p>
-                <ul>
-                    <li>"Salary", "Investment", "Payment for services", "Personal transfer"</li>
-                </ul>
-                <p><strong>Impact:</strong> Compliance reporting, AML risk assessment</p>
-            </div>
-            
-            <div class="highlight-box">
-                <h3>is_self_transfer (Required)</h3>
-                <p>Is sender = recipient?</p>
-                <ul>
-                    <li><code>true</code>: Same person moving own funds</li>
-                    <li><code>false</code>: Sending to someone else</li>
-                </ul>
-                <p><strong>Impact:</strong> Different compliance checks</p>
-            </div>
-            
-            <div class="highlight-box">
-                <h3>application_transfer_uuid (Required)</h3>
-                <p>Your unique ID for this transfer</p>
-                <ul>
-                    <li>Use for reconciliation between systems</li>
-                    <li>Enables idempotency (safe retries)</li>
-                    <li><strong>Critical</strong> for support requests</li>
-                </ul>
-                <p><strong>Best Practice:</strong> <code>txn_${timestamp}_${randomID}</code></p>
-            </div>
-        </div>
+      <h3>Step 3: Register Customer's Bank Account / Crypto Address</h3>
+      <div class="code-block">
+        POST /customers/{uuid}/bank_accounts<br />
 
-        <!-- Slide 14 -->
-        <div class="slide">
-            <div class="slide-number">14 / 20</div>
-            <h2>Transfer Status & Tracking</h2>
-            
-            <h3>Status Lifecycle</h3>
-            <div class="diagram">
-pending_customer_transfer_start<br>
-    ↓ <br>(Customer sends funds)<br>
-processing<br>
-    ↓ <br>(Harbor verifying & converting)<br>
-completed <span class="checkmark">✓</span>
-            </div>
-            
-            <h3>All Status Values</h3>
-            <table>
-                <tr>
-                    <th>Status</th>
-                    <th>Meaning</th>
-                    <th>Your Action</th>
-                </tr>
-                <tr>
-                    <td>pending_customer_transfer_start</td>
-                    <td>Waiting for funds</td>
-                    <td>Show instructions</td>
-                </tr>
-                <tr>
-                    <td>processing</td>
-                    <td>Harbor processing</td>
-                    <td>Wait (show progress)</td>
-                </tr>
-                <tr>
-                    <td>completed</td>
-                    <td>Success!</td>
-                    <td>Notify customer ✅</td>
-                </tr>
-                <tr>
-                    <td>failed</td>
-                    <td>Error occurred</td>
-                    <td>Check error, contact support</td>
-                </tr>
-                <tr>
-                    <td>pending_rfi</td>
-                    <td>More info needed</td>
-                    <td>Request documents</td>
-                </tr>
-            </table>
-            
-         
-        </div>
+        { "account_type": "checking",<br />
+        "account_number": "124567890",<br />
+        "routing_number": "021000021",<br />
+        "bank_name": "Chase Bank",<br />
+        "bank_country": "US",<br />
+        "bank_state": "AL",<br />
+        }
+      </div>
 
-        <!-- Slide 15 -->
-        <div class="slide">
+      <h3>Step 4: Create Transfer</h3>
+      <div class="code-block">
+        POST /transfers<br />
+
+        { "on_behalf_of": "cus_abc123",<br />
+        "source": {"asset": "USD", "amount": "100.00"},<br />
+        "destination": {<br />
+        "asset": "USDC", "chain": "ethereum",<br />
+        "address": "0x742d35Cc...",<br />
+        "transfer_purpose": "Investment",<br />
+        } }
+      </div>
+      <p>
+        Note: Please be aware we have a
+        <a
+          href="https://harbor-developers.owlpay.com/docs/simulate-transfer-status-apis#/"
+          target="_blank"
+          ><strong
+            >sandbox endpoint to simulate transfers for testing
+            purposes.</strong
+          ></a
+        >
+      </p>
+    </div>
+
+    <!-- Slide 10 -->
+    <div class="slide">
+      <div class="slide-number">10 / 20</div>
+      <h2>Workflow 1 - On-Ramp (USD → USDC)</h2>
+
+      <p style="font-size: 1.2em; margin-bottom: 20px">
+        <strong>Use Case:</strong> Customer wants to buy crypto
+      </p>
+
+      <h3>API Request Structure</h3>
+      <div class="code-block">
+        { "on_behalf_of": "cus_abc123",<br />
+        "source": {<br />
+        "asset": "USD",<br />
+        "amount": "100.00"<br />
+        },<br />
+        "destination": {<br />
+        "asset": "USDC",<br />
+        "chain": "ethereum",<br />
+        "address": "0x...",<br />
+        "transfer_purpose": "Investment",<br />
+        "is_self_transfer": false<br />
+        },<br />
+        "commission": {"percentage": "0.01", "amount": "1.00"},<br />
+        "application_transfer_uuid": "txn_unique_789"<br />
+        }
+      </div>
+
+      <h3>API Response</h3>
+      <div class="code-block">
+        { "transfer_instructions": {<br />
+        "account_number": "123456789",<br />
+        "routing_number": "987654321",<br />
+        "bank_name": "FV Bank",<br />
+        "narrative": "CRITICAL_REF_CODE" ← Customer MUST include<br />
+        } }
+      </div>
+
+      <div class="diagram">
+        Customer sends USD (with ref code) → Harbor receives<br />
+        → Harbor sends USDC to wallet →
+        <span class="checkmark">✅ Complete</span>
+      </div>
+    </div>
+
+    <!-- Slide 11 -->
+    <div class="slide">
+      <div class="slide-number">11 / 20</div>
+      <h2>Workflow 2 - Off-Ramp (USDC → USD)</h2>
+
+      <p style="font-size: 1.2em; margin-bottom: 20px">
+        <strong>Use Case:</strong> Customer wants to cash out
+      </p>
+
+      <h3>API Request Structure</h3>
+      <div class="code-block">
+        { "on_behalf_of": "cus_abc123",<br />
+        "source": {<br />
+        "chain": "ethereum",<br />
+        "asset": "USDC",<br />
+        "amount": "1000.00"<br />
+        },<br />
+        "destination": {<br />
+        "asset": "USD",<br />
+        "customer_bank_account_id": "bank_xyz",<br />
+        "transfer_purpose": "Withdrawal",<br />
+        "is_self_transfer": false<br />
+        },<br />
+        "commission": {"percentage": "0.01", "amount": "1.00"} }
+      </div>
+
+      <h3>API Response</h3>
+      <div class="code-block">
+        { "transfer_instructions": {<br />
+        "instruction_chain": "ethereum",<br />
+        "instruction_address": "0xbf2f9dd51e8f..."<br />
+        } }
+      </div>
+
+      <div class="diagram">
+        Customer sends USDC on-chain → Harbor receives<br />
+        → Harbor sends USD to bank → <span class="checkmark">✅ Complete</span>
+      </div>
+    </div>
+
+    <!-- Slide 12 -->
+    <div class="slide">
+      <div class="slide-number">12 / 20</div>
+      <h2>Workflow 3 - On-Chain Transfer</h2>
+
+      <p style="font-size: 1.2em; margin-bottom: 20px">
+        <strong>Use Case:</strong> Move crypto between blockchains (e.g.,
+        Ethereum → Polygon for lower fees)
+      </p>
+
+      <h3>API Request</h3>
+      <div class="code-block">
+        { "on_behalf_of": "cus_abc123",<br />
+        "source": {<br />
+        "chain": "ethereum",<br />
+        "asset": "USDC",<br />
+        "amount": "500.00"<br />
+        },<br />
+        "destination": {<br />
+        "chain": "polygon",<br />
+        "asset": "USDC",<br />
+        "address": "0x...",<br />
+        "transfer_purpose": "Chain migration",<br />
+        "is_self_transfer": true<br />
+        } }
+      </div>
+
+      <div class="diagram" style="margin-top: 30px">
+        USDC moves from Ethereum → Polygon<br />
+        Lower fees for future transactions <span class="checkmark">✅</span>
+      </div>
+
+      <h3>Use Cases:</h3>
+      <ul>
+        <li>L1 ↔ L2 migrations</li>
+        <li>Cross-chain arbitrage</li>
+      </ul>
+    </div>
+
+    <!-- Slide 13 -->
+    <div class="slide">
+      <div class="slide-number">13 / 20</div>
+      <h2>Key API Fields Explained</h2>
+
+      <div class="highlight-box">
+        <h3>transfer_purpose (Required)</h3>
+        <p>Why the transfer is happening</p>
+        <ul>
+          <li>
+            "Salary", "Investment", "Payment for services", "Personal transfer"
+          </li>
+        </ul>
+        <p>
+          <strong>Impact:</strong> Compliance reporting, AML risk assessment
+        </p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>is_self_transfer (Required)</h3>
+        <p>Is sender = recipient?</p>
+        <ul>
+          <li><code>true</code>: Same person moving own funds</li>
+          <li><code>false</code>: Sending to someone else</li>
+        </ul>
+        <p><strong>Impact:</strong> Different compliance checks</p>
+      </div>
+
+      <div class="highlight-box">
+        <h3>application_transfer_uuid (Required)</h3>
+        <p>Your unique ID for this transfer</p>
+        <ul>
+          <li>Use for reconciliation between systems</li>
+          <li>Enables idempotency (safe retries)</li>
+          <li><strong>Critical</strong> for support requests</li>
+        </ul>
+        <p>
+          <strong>Best Practice:</strong>
+          <code>txn_${timestamp}_${randomID}</code>
+        </p>
+      </div>
+    </div>
+
+    <!-- Slide 14 -->
+    <div class="slide">
+      <div class="slide-number">14 / 20</div>
+      <h2>Transfer Status & Tracking</h2>
+
+      <h3>Status Lifecycle</h3>
+      <div class="diagram">
+        pending_customer_transfer_start<br />
+        ↓ <br />(Customer sends funds)<br />
+        processing<br />
+        ↓ <br />(Harbor verifying & converting)<br />
+        completed <span class="checkmark">✓</span>
+      </div>
+
+      <h3>All Status Values</h3>
+      <table>
+        <tr>
+          <th>Status</th>
+          <th>Meaning</th>
+          <th>Your Action</th>
+        </tr>
+        <tr>
+          <td>pending_customer_transfer_start</td>
+          <td>Waiting for funds</td>
+          <td>Show instructions</td>
+        </tr>
+        <tr>
+          <td>processing</td>
+          <td>Harbor processing</td>
+          <td>Wait (show progress)</td>
+        </tr>
+        <tr>
+          <td>completed</td>
+          <td>Success!</td>
+          <td>Notify customer ✅</td>
+        </tr>
+        <tr>
+          <td>failed</td>
+          <td>Error occurred</td>
+          <td>Check error, contact support</td>
+        </tr>
+        <tr>
+          <td>pending_rfi</td>
+          <td>More info needed</td>
+          <td>Request documents</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Slide 15 -->
+    <!-- <div class="slide">
             <div class="slide-number">15 / 20</div>
             <h2>Payment Methods - Store vs. Dynamic</h2>
             
@@ -865,10 +934,10 @@ POST /customers/{uuid}/bank_accounts
 }
             </div>
             <p><strong>Benefits:</strong> More flexible, no storage, good for one-time transfers</p>
-        </div>
+        </div> -->
 
-        <!-- Slide 16 -->
-        <!-- <div class="slide">
+    <!-- Slide 16 -->
+    <!-- <div class="slide">
             <div class="slide-number">16 / 20</div>
             <h2>Error Handling</h2>
             
@@ -907,8 +976,8 @@ POST /customers/{uuid}/bank_accounts
             </ol>
         </div> -->
 
-        <!-- Slide 17 -->
-        <!-- <div class="slide">
+    <!-- Slide 17 -->
+    <!-- <div class="slide">
             <div class="slide-number">17 / 20</div>
             <h2>Security & Best Practices</h2>
             
@@ -953,80 +1022,153 @@ POST /customers/{uuid}/bank_accounts
             </div>
         </div> -->
 
-        <!-- Slide 18 -->
-        <div class="slide">
-            <div class="slide-number">18 / 20</div>
-            <h2>Integration Timeline & Checklist</h2>
-            
-            <div class="two-column">
-                <div>
-                    <h3>Week 1: Setup & Core</h3>
-                    <ul>
-                        <li>☐ Day 1-2: Get sandbox API key, setup auth</li>
-                        <li>☐ Day 3-4: Implement customer creation & KYC</li>
-                        <li>☐ Day 5: Add payment methods</li>
-                    </ul>
-                    
-                    <h3>Week 2: Transfers & Testing</h3>
-                    <ul>
-                        <li>☐ Day 1-2: Implement on-ramp transfers</li>
-                        <li>☐ Day 3: Implement off-ramp transfers</li>
-                        <li>☐ Day 4-5: Testing, error handling</li>
-                    </ul>
-                </div>
-                <div>
-                    <h3>Week 3: Production (if needed)</h3>
-                    <ul>
-                        <li>☐ Request production API key</li>
-                        <li>☐ Deploy to production</li>
-                        <li>☐ Monitor first live transfers</li>
-                    </ul>
-                    
-                    <h3>Ready for Production When:</h3>
-                    <ul>
-                        <li><span class="checkmark">✅</span> All sandbox tests passing</li>
-                        <li><span class="checkmark">✅</span> Error handling implemented</li>
-                        <li><span class="checkmark">✅</span> User experience polished</li>
-                        <li><span class="checkmark">✅</span> Security review complete</li>
-                        <li><span class="checkmark">✅</span> Support process defined</li>
-                    </ul>
-                </div>
-            </div>
-        </div>
+    <!-- Slide 18 -->
+    <div class="slide">
+      <div class="slide-number">18 / 20</div>
+      <h2>Integration Timeline & Checklist</h2>
 
-        <!-- Slide 19 -->
-        <div class="slide">
-            <div class="slide-number">19 / 20</div>
-            <h2>Support & Resources</h2>
-            
-            <h3>Get Started</h3>
-            <div class="highlight-box">
-                <p style="font-size: 1.3em;">📧 <strong>Email:</strong> contact-us@owlting.com</p>
-                <p><strong>Include in your request:</strong></p>
-                <ul>
-                    <li>Company name & website</li>
-                    <li>Use case / integration type</li>
-                    <li>Expected monthly volume</li>
-                    <li>Timeline</li>
-                </ul>
-            </div>
-            
-            <h3>Documentation</h3>
-            <ul>
-                <li>📚 <strong>Full Docs:</strong> harbor-developers.owlpay.com/docs/overview</li>
-                <li>📖 <strong>API Reference:</strong> harbor-developers.owlpay.com/reference</li>
-            </ul>
-            
-            <h3>We Help With</h3>
-            <ul>
-                <li>Integration architecture & planning</li>
-                <li>Technical questions during development</li>
-                <li>Volume pricing & partnerships</li>
-                <li>Production deployment support</li>
-            </ul>
-        </div>
+      <div class="two-column">
+        <div>
+          <h3>Week 1: Setup & Core</h3>
+          <ul>
+            <li>☐ Day 1-2: Get sandbox API key, setup auth</li>
+            <li>☐ Day 3-4: Implement customer creation & KYC</li>
+            <li>☐ Day 5: Add payment methods</li>
+          </ul>
 
-        <!-- Slide 20
+          <h3>Week 2: Transfers & Testing</h3>
+          <ul>
+            <li>☐ Day 1-2: Implement on-ramp transfers</li>
+            <li>☐ Day 3: Implement off-ramp transfers</li>
+            <li>☐ Day 4-5: Testing, error handling</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Week 3: Production (if needed)</h3>
+          <ul>
+            <li>☐ Request production API key</li>
+            <li>☐ Deploy to production</li>
+            <li>☐ Monitor first live transfers</li>
+          </ul>
+
+          <h3>Ready for Production When:</h3>
+          <ul>
+            <li><span class="checkmark">✅</span> All sandbox tests passing</li>
+            <li>
+              <span class="checkmark">✅</span> Error handling implemented
+            </li>
+            <li><span class="checkmark">✅</span> User experience polished</li>
+            <li><span class="checkmark">✅</span> Security review complete</li>
+            <li><span class="checkmark">✅</span> Support process defined</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="slide">
+      <div class="slide-number active">1 / 20</div>
+      <div class="section-header">PART 4: Stellar Anchor</div>
+      <h2>Harbor's Stellar Anchor</h2>
+      <p style="font-size: 1.2em; margin-bottom: 20px">
+        An on- and off-ramp solution which can facilitate cross border payments
+        using the Stellar network.
+      </p>
+      <div class="logo" id="logo">
+        <img
+          src="./images/stellar-logo.png"
+          alt="Harbor Logo"
+          style="top: 20px; left: 20px; height: 50px; z-index: 1000"
+        />
+      </div>
+
+      <h3>We have implemented two of Stellar's ecosystem protocols (SEP):</h3>
+
+      <div class="two-column" style="margin-top: 30px">
+        <div>
+          <h3>SEP-10: Authorization</h3>
+          <ul style="font-size: 0.95em">
+            <li>
+              An API protocol that defines a standard for way for clients
+              (wallets/users) to create authenticated web sessions.
+            </li>
+          </ul>
+        </div>
+        <div>
+          <h3>SEP-24: Hosted Deposit and Withdrawal</h3>
+          <ul style="font-size: 0.95em">
+            <li>
+              Defines a standard way for wallets to interact with anchors to
+              facilitate deposits and withdrawals.
+            </li>
+          </ul>
+        </div>
+      </div>
+      <p>Note: Check out <a href=https://demo-wallet.stellar.org/ target="_blank">demo-wallet.stellar.org</a> for a live demo and to learn more about these API flows.
+    </p>
+    <br>
+    <p> Our doc on how to integrate with our Stellar Anchor can be found <a href="https://harbor-developers.owlpay.com/docs/integrate-with-owlpay-harbor-stellar-anchor#/" target="_blank">here</a>.
+</p>
+    </div>
+
+    <!-- Slide 19 -->
+    <div class="slide">
+      <div class="slide-number">19 / 20</div>
+      <h2>Support & Resources</h2>
+
+      <h3>Get Started</h3>
+      <div class="highlight-box">
+        <p style="font-size: 1.3em">
+          📧 <strong>Email:</strong> contact-us@owlting.com
+        </p>
+        <p><strong>Include in your request:</strong></p>
+        <ul>
+          <li>Company name & website</li>
+          <li>Use case / integration type</li>
+          <li>Expected monthly volume</li>
+          <li>Timeline</li>
+        </ul>
+      </div>
+
+      <h3>Documentation</h3>
+      <ul>
+        <li>
+          📚 <strong>Full Docs:</strong>
+          <a
+            href="https://harbor-developers.owlpay.com/docs/overview#/"
+            target="_blank"
+            >harbor-developers.owlpay.com/docs</a
+          >
+        </li>
+        <li>
+          📖 <strong>API Reference:</strong>
+          <a
+            href="https://harbor-developers.owlpay.com/reference/retrieveallcustomersbankaccounts#/"
+            target="_blank"
+            >harbor-developers.owlpay.com</a
+          >
+        </li>
+        <li>
+          📖 <strong>Our licensing:</strong>
+          <a
+            href="https://www.owlting.com/owlpay/licenses?lang=en"
+            target="_blank"
+            >owlting.com/owlpay/licenses</a
+          >
+          <br />Note: We can off ramp in any state, but only on ramp users
+          (business or individual) in the states where we are licensed.
+        </li>
+      </ul>
+
+      <h3>We Help With</h3>
+      <ul>
+        <li>Integration architecture & planning</li>
+        <li>Technical questions during development</li>
+        <li>Volume pricing & partnerships</li>
+        <li>Production deployment support</li>
+      </ul>
+    </div>
+
+    <!-- Slide 20
         <div class="slide">
             <div class="slide-number">20 / 20</div>
             <h2>Let's Build Together</h2>
@@ -1056,48 +1198,48 @@ POST /customers/{uuid}/bank_accounts
                 </p>
             </div>
         </div> -->
-    </div>
+  </div>
 
-    <div class="controls">
-        <button id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
-        <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
-    </div>
+  <div class="controls">
+    <button id="prevBtn" onclick="changeSlide(-1)">← Previous</button>
+    <button id="nextBtn" onclick="changeSlide(1)">Next →</button>
+  </div>
 
-    <script>
-        let currentSlide = 0;
-        const slides = document.querySelectorAll('.slide');
-        const totalSlides = slides.length;
-        const progressBar = document.getElementById('progressBar');
+  <script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll(".slide");
+    const totalSlides = slides.length;
+    const progressBar = document.getElementById("progressBar");
 
-        function showSlide(n) {
-            slides[currentSlide].classList.remove('active');
-            currentSlide = (n + totalSlides) % totalSlides;
-            slides[currentSlide].classList.add('active');
-            
-            // Update progress bar
-            const progress = ((currentSlide + 1) / totalSlides) * 100;
-            progressBar.style.width = progress + '%';
-            
-            // Update button states
-            document.getElementById('prevBtn').disabled = currentSlide === 0;
-            document.getElementById('nextBtn').disabled = currentSlide === totalSlides - 1;
-        }
+    function showSlide(n) {
+      slides[currentSlide].classList.remove("active");
+      currentSlide = (n + totalSlides) % totalSlides;
+      slides[currentSlide].classList.add("active");
 
-        function changeSlide(direction) {
-            showSlide(currentSlide + direction);
-        }
+      // Update progress bar
+      const progress = ((currentSlide + 1) / totalSlides) * 100;
+      progressBar.style.width = progress + "%";
 
-        // Keyboard navigation
-        document.addEventListener('keydown', function(event) {
-            if (event.key === 'ArrowLeft') {
-                changeSlide(-1);
-            } else if (event.key === 'ArrowRight' || event.key === ' ') {
-                changeSlide(1);
-            }
-        });
+      // Update button states
+      document.getElementById("prevBtn").disabled = currentSlide === 0;
+      document.getElementById("nextBtn").disabled =
+        currentSlide === totalSlides - 1;
+    }
 
-        // Initialize
-        showSlide(0);
-    </script>
-</body>
+    function changeSlide(direction) {
+      showSlide(currentSlide + direction);
+    }
+
+    // Keyboard navigation
+    document.addEventListener("keydown", function (event) {
+      if (event.key === "ArrowLeft") {
+        changeSlide(-1);
+      } else if (event.key === "ArrowRight" || event.key === " ") {
+        changeSlide(1);
+      }
+    });
+
+    // Initialize
+    showSlide(0);
+  </script>
 </html>
